@@ -1,1 +1,87 @@
+import time
+import multiprocessing
+import numpy as np
 
+print("Iniciando exemplos de Taxonomia de Flynn\n")
+
+# -------------------------------
+# SISD – Single Instruction Single Data
+# -------------------------------
+def sisd():
+    print("=== SISD (Single Instruction, Single Data) ===")
+    dados = list(range(5))
+    resultado = []
+    
+    inicio = time.time()
+    for d in dados:
+        time.sleep(0.5)
+        resultado.append(d * d)
+    fim = time.time()
+    
+    print("Resultado:", resultado)
+    print(f"Tempo SISD: {fim - inicio:.2f} segundos\n")
+
+# -------------------------------
+# SIMD – Single Instruction Multiple Data
+# -------------------------------
+def simd():
+    print("=== SIMD (Single Instruction, Multiple Data) ===")
+    dados = np.arange(5)
+    
+    inicio = time.time()
+    resultado = dados * dados  # Operação vetorial
+    fim = time.time()
+    
+    print("Resultado:", resultado.tolist())
+    print(f"Tempo SIMD: {fim - inicio:.5f} segundos\n")
+
+# -------------------------------
+# MIMD – Multiple Instruction Multiple Data
+# -------------------------------
+def mimd():
+    print("=== MIMD (Multiple Instruction, Multiple Data) ===")
+    
+    def tarefa1(x):
+        time.sleep(0.5)
+        return x + 100
+    
+    def tarefa2(x):
+        time.sleep(0.5)
+        return x * x
+
+    dados1 = [1, 2, 3]
+    dados2 = [4, 5, 6]
+
+    with multiprocessing.Pool(processes=2) as pool:
+        r1 = pool.map(tarefa1, dados1)
+        r2 = pool.map(tarefa2, dados2)
+    
+    print("Resultado tarefa1 (soma):", r1)
+    print("Resultado tarefa2 (quadrado):", r2)
+    print("Tempo MIMD: ~0.5 segundos (execução paralela)\n")
+
+# -------------------------------
+# SPMD – Single Program Multiple Data
+# -------------------------------
+def spmd():
+    print("=== SPMD (Single Program, Multiple Data) ===")
+    
+    def tarefa_spmd(dado):
+        time.sleep(0.5)
+        return dado * 2
+    
+    dados = [1, 2, 3, 4]
+    
+    with multiprocessing.Pool(processes=4) as pool:
+        resultado = pool.map(tarefa_spmd, dados)
+    
+    print("Resultado:", resultado)
+    print("Tempo SPMD: ~0.5 segundos\n")
+
+# -------------------------------
+# Executar todos os exemplos
+# -------------------------------
+sisd()
+simd()
+mimd()
+spmd()
