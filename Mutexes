@@ -1,0 +1,63 @@
+######## código aula 2.3 #########
+
+import threading
+import time
+import random
+
+# Definimos o semáforo para controlar o acesso à seção crítica
+# Inicializamos com 1, permitindo que apenas uma thread acesse por vez (exclusão mútua)
+# Isso é análogo a 'init(s, 1)' do slide [3]
+semaforo = threading.Semaphore(1)
+
+# Variável global para simular um recurso compartilhado (saldo de uma conta, por exemplo)
+saldo = 0
+
+def operar_saldo(id_thread, operacao, valor):
+    global saldo
+    print(f"Thread {id_thread}: Tentando acessar o saldo para {operacao} {valor}...")
+
+    # Solicita acesso à seção crítica.
+    # Corresponde a 'down(s)' no slide [3]. Se o semáforo estiver ocupado, a thread bloqueia aqui.
+    semaforo.acquire()
+    try:
+        print(f"Thread {id_thread}: Acesso concedido (seção crítica). Saldo atual: {saldo}")
+        # Seção crítica: manipulação do recurso compartilhado
+        if operacao == "depositar":
+            saldo += valor
+            print(f"Thread {id_thread}: Depositou {valor}. Novo saldo: {saldo}")
+        elif operacao == "sacar":
+            if saldo >= valor:
+                saldo -= valor
+                print(f"Thread {id_thread}: Sacou {valor}. Novo saldo: {saldo}")
+            else:
+                print(f"Thread {id_thread}: Não pôde sacar {valor}. Saldo insuficiente: {saldo}")
+        
+        # Simula algum processamento dentro da seção crítica
+        time.sleep(random.uniform(0.1, 0.5))
+
+    finally:
+        # Libera o acesso à seção crítica.
+        # Corresponde a 'up(s)' no slide [3]. Isso permite que outra thread que estava aguardando continue.
+        semaforo.release()
+        print(f"Thread {id_thread}: Liberou a seção crítica.")
+
+# Criação de várias threads para simular operações concorrentes
+threads = []
+for i in range(5):
+    # Alterna entre depositar e sacar
+    if i % 2 == 0:
+        op = "depositar"
+        val = random.randint(10, 50)
+    else:
+        op = "sacar"
+        val = random.randint(5, 30)
+
+    thread = threading.Thread(target=operar_saldo, args=(i + 1, op, val))
+    threads.append(thread)
+    thread.start()
+
+# Espera todas as threads terminarem
+for thread in threads:
+    thread.join()
+
+print(f"\nTodas as operações concluídas. Saldo final: {saldo}")
