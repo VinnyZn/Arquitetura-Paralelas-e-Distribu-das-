@@ -1,0 +1,36 @@
+####### Código ########
+
+import threading
+import time
+
+# Função que será executada pela thread
+def contagem(nome, tempo):
+    print(f"Thread {nome} iniciada")
+    time.sleep(tempo)
+    print(f"Thread {nome} finalizada após {tempo} segundos")
+
+# Criando threads
+t1 = threading.Thread(target=contagem, args=("A", 2))
+t2 = threading.Thread(target=contagem, args=("B", 3))
+t3 = threading.Thread(target=contagem, args=("C", 1))
+
+# Iniciando as threads
+t1.start()
+t2.start()
+t3.start()
+
+# Esperando todas as threads terminarem
+t1.join()
+t2.join()
+t3.join()
+
+print("Todas as threads terminaram.")
+
+###### Resposta ########
+Eu entendi que quando o código é executado ele cria  três threads e começam a executar a função contagem, cada uma está meio que "dormindo" por um tempo diferente.
+Isso é uma forma de execução, onde ele alterna entre as threads, sem que uma precise esperar pela outra.
+E a mensagem "Todas as threads terminaram" só aparece quando todas as threads concluem sua execução.
+
+
+###### O que eu entendi da aula #######
+O Pthreads ajuda a criar e gerenciar threads para que um programa possa realizar várias tarefas ao mesmo tempo para que não precise esperar pela outra elas processam o mesmo espaço de memória e recursos.
